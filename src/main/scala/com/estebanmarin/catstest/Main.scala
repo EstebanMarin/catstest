@@ -1,55 +1,45 @@
 package com.estebanmarin
 package catstest
 
-object Main extends App {
-  println("─" * 100)
-  // implicit classes
+object TypeClasses {
 
-  case class Person(name: String) {
-    def greet: String = s"Hi, My name is $name"
-  }
-  implicit class ImpersonableString(name: String) {
-    println("Hello in the implicit")
-    def greet: String = s"Hello $name"
-  }
+  //Type Classes: A programming pattern to add capabiilties to exisiting types
+  case class Person(name: String, age: Int)
 
-  val greeting = "Petter".greet
-//importing implicits conversions in Scope
-  import scala.concurrent.duration._
-  val oneSet = 1.second
-  println(oneSet)
-  //implicit arguments and values
-  def increment(x: Int)(implicit amount: Int) = x + amount
-  implicit val amount = 4
-  println(increment(4))
-
+  //part 1 type class definition
   trait JSONSerializer[T] {
     def toJson(value: T): String
   }
 
-  def listToJson[T](list: List[T])(implicit serializer: JSONSerializer[T]): String =
+  //part 2 - create implicit type class INSTANCES
+  implicit object StringSerializer extends JSONSerializer[String] {
+    override def toJson(value: String) = "\"" + value + "\""
+  }
+
+  implicit object IntSerializer extends JSONSerializer[Int] {
+    override def toJson(value: Int): String = value.toString()
+  }
+
+  implicit object PersonSerializer extends JSONSerializer[Person] {
+    override def toJson(value: Person): String =
+      s"""
+      |{"name": ${value.name}}, "age": ${value.age}
+      """.stripMargin.trim()
+  }
+
+  //part 3 - offer some API
+  def convertListToJSON[T](list: List[T])(implicit serializer: JSONSerializer[T]): String =
     list.map(value => serializer.toJson(value)).mkString("[", ",", "]")
 
-  implicit val personSerializer: JSONSerializer[Person] = new JSONSerializer[Person] {
-    override def toJson(person: Person): String = person.name
+  //part 4 extending types
+  object JSONSyntax {
+    implicit class JSONSerializable[T](value: T)(implicit serializer: JSONSerializer[T]) {
+      def toJson: String = serializer.toJson(value)
+    }
   }
 
-  val personJson = listToJson(List(Person("Alice"), Person("Bob")))
-  println(personJson)
-
-  //implicit argument is used to PROVE THE EXISTENCE of a type
-
-  //implicit methods
-
-  implicit def onArgCaseClaseSerializer[T <: Product]: JSONSerializer[T] = new JSONSerializer[T] {
-    override def toJson(value: T): String = s"""
-    |"${value.productElementName(0)}" : "${value.productElement(0)}"
-    """
+  def main(args: Array[String]): Unit = {
+    import JSONSyntax._
+    println(Person("Esteban", 35).toJson)
   }
-
-  case class Cat(name: String)
-
-  val catToJson = listToJson(List(Cat("Fluffy"), Cat("Anthony")))
-  println(catToJson)
-  println("─" * 100)
 }
