@@ -31,12 +31,25 @@ object Main extends App {
     list.map(value => serializer.toJson(value)).mkString("[", ",", "]")
 
   implicit val personSerializer: JSONSerializer[Person] = new JSONSerializer[Person] {
-    def toJson(person: Person): String = person.name
+    override def toJson(person: Person): String = person.name
   }
 
   val personJson = listToJson(List(Person("Alice"), Person("Bob")))
   println(personJson)
 
   //implicit argument is used to PROVE THE EXISTENCE of a type
+
+  //implicit methods
+
+  implicit def onArgCaseClaseSerializer[T <: Product]: JSONSerializer[T] = new JSONSerializer[T] {
+    override def toJson(value: T): String = s"""
+    |"${value.productElementName(0)}" : "${value.productElement(0)}"
+    """
+  }
+
+  case class Cat(name: String)
+
+  val catToJson = listToJson(List(Cat("Fluffy"), Cat("Anthony")))
+  println(catToJson)
   println("─" * 100)
 }
