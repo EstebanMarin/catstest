@@ -88,7 +88,8 @@ object Functors {
   def do10xShorter[F[_]: Functor](container: F[Int]): F[Int] =
     container.map(_ * 10)
 
-  def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
+//   def main(args: Array[String]): Unit = {
     println("-" * 50)
     // println(do10x(List(1, 2, 3)))
     // println(do10x(Option(20)))
