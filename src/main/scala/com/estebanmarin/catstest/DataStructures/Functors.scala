@@ -72,6 +72,7 @@ object Functors {
   //extension methods - map
   // we will put in scope
   import cats.syntax.functor._
+
   val testTree: Tree[Int] =
     Tree.branch(40, Tree.branch(5, Tree.leaf(10), Tree.leaf(30)), Tree.leaf(20))
 
@@ -83,6 +84,10 @@ object Functors {
   // def do10x[F[_]](container: F[Int])(implicit functor: Functor[F]): F[Int] =
   // functor.map(container)(_ * 1)
 
+  // Context bound Implicit
+  def do10xShorter[F[_]: Functor](container: F[Int]): F[Int] =
+    container.map(_ * 10)
+
   def main(args: Array[String]): Unit = {
     println("-" * 50)
     // println(do10x(List(1, 2, 3)))
@@ -91,7 +96,9 @@ object Functors {
     // //notice that this Functor in Scope def do10x[F[_]](container: F[Int])(implicit functor: Functor[F]): F[Int]
     // // Now that we implemented the Functor for our tree, we can now apply do10x
     // println(do10x[Tree](Tree.branch(30, Tree.leaf(10), Tree.leaf(10))))
-    print(this.incrementedTree)
+
+    println(do10x(this.testTree))
+    println(do10xShorter(this.testTree))
     println()
     println("-" * 50)
   }
