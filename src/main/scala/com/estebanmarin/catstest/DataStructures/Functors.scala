@@ -44,7 +44,24 @@ object Functors {
   //TODO - 1 define your own functor for a Binary tree
   // create your onw Functor
   // define an object which extends Functor[Tree]
+
+  implicit object treeFunctor extends Functor[Tree] {
+    override def map[A, B](fa: Tree[A])(f: A => B): Tree[B] = fa match {
+      case Branch(v, left, right) => Branch(f(v), map(left)(f), map(right)(f))
+      case Leaf(v) => Leaf(f(v))
+    }
+  }
+
   sealed trait Tree[+T]
+  // "smart" constructor
+  object Tree {
+    def leaf[T](value: T): Leaf[T] = Leaf(value)
+    def branch[T](
+        value: T,
+        left: Tree[T],
+        right: Tree[T],
+      ): Tree[T] = Branch(value, left, right)
+  }
   final case class Leaf[+T](value: T) extends Tree[T]
   final case class Branch[+T](
       value: T,
@@ -52,13 +69,30 @@ object Functors {
       right: Tree[T],
     ) extends Tree[T]
 
+  //extension methods - map
+  // we will put in scope
+  import cats.syntax.functor._
+  val testTree: Tree[Int] =
+    Tree.branch(40, Tree.branch(5, Tree.leaf(10), Tree.leaf(30)), Tree.leaf(20))
+
+  val incrementedTree: Tree[Int] = testTree.map(_ + 10)
+
+  //TODO - 3
+  // write a shorter method of with extension methods
+  // generalize this function
+  // def do10x[F[_]](container: F[Int])(implicit functor: Functor[F]): F[Int] =
+  // functor.map(container)(_ * 1)
+
   def main(args: Array[String]): Unit = {
     println("-" * 50)
-    println(do10x(List(1, 2, 3)))
-    println(do10x(Option(20)))
-    println(do10x(Try(42)))
-    //notice that this Functor in Scope def do10x[F[_]](container: F[Int])(implicit functor: Functor[F]): F[Int]
-
+    // println(do10x(List(1, 2, 3)))
+    // println(do10x(Option(20)))
+    // println(do10x(Try(42)))
+    // //notice that this Functor in Scope def do10x[F[_]](container: F[Int])(implicit functor: Functor[F]): F[Int]
+    // // Now that we implemented the Functor for our tree, we can now apply do10x
+    // println(do10x[Tree](Tree.branch(30, Tree.leaf(10), Tree.leaf(10))))
+    print(this.incrementedTree)
+    println()
     println("-" * 50)
   }
 }
