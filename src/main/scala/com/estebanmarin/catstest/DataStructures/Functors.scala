@@ -1,6 +1,7 @@
 package com.estebanmarin.catstest.DataStructures
 
 import scala.util.Try
+import cats.instances.list
 
 object Functors {
   val aModifiedList = List(1, 2, 3, 4).map(_ + 2)
@@ -31,11 +32,33 @@ object Functors {
   import cats.instances.try_._
 
   val anIncrementedTry = Functor[Try].map(Try(42))(_ + 1)
-  println(anIncrementedTry)
+
+  //generalizing API
+  def do10xList(list: List[Int]): List[Int] = list.map(_ * 10)
+  def do10xOption(option: Option[Int]): Option[Int] = option.map(_ * 10)
+  def do10xTry(attemp: Try[Int]): Try[Int] = attemp.map(_ * 10)
+
+  def do10x[F[_]](container: F[Int])(implicit functor: Functor[F]): F[Int] =
+    functor.map(container)(_ * 10)
+
+  //TODO - 1 define your own functor for a Binary tree
+  // create your onw Functor
+  // define an object which extends Functor[Tree]
+  sealed trait Tree[+T]
+  final case class Leaf[+T](value: T) extends Tree[T]
+  final case class Branch[+T](
+      value: T,
+      left: Tree[T],
+      right: Tree[T],
+    ) extends Tree[T]
 
   def main(args: Array[String]): Unit = {
     println("-" * 50)
-    println("In Functors")
+    println(do10x(List(1, 2, 3)))
+    println(do10x(Option(20)))
+    println(do10x(Try(42)))
+    //notice that this Functor in Scope def do10x[F[_]](container: F[Int])(implicit functor: Functor[F]): F[Int]
+
     println("-" * 50)
   }
 }
