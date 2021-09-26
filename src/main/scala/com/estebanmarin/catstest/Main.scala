@@ -3,5 +3,5 @@ package catstest
 
 object CatsIntro {
   def main(args: Array[String]): Unit =
-    Semigroups.Semigroups.run()
+    DataStructures.Monoids.run()
 }
