@@ -4,7 +4,6 @@ package DataStructures
 object Semigroups {
   //Semigroups combine
   import cats.Semigroup
-  import cats.instances._
 
   val naturalIntSemigroup: Semigroup[Int] = Semigroup[Int]
   val intCombinations: Int = naturalIntSemigroup.combine(42, 6)
@@ -37,7 +36,8 @@ object Semigroups {
   def reduceThings2[T: Semigroup](list: List[T]): T =
     list.reduce(_ |+| _)
 
-  def run(): Unit = {
+  // def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
     println("-" * 50)
     reduceInts((1 to 10).toList)
     reduceStrings(List("Esteban ", "ama", " a Gisellita"))
