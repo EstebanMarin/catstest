@@ -64,12 +64,45 @@ object MyMonads {
   import cats.instances.list._
   val listMonads: Monad[List] = Monad[List]
   val aList: List[Int] = listMonads.pure(3)
-  val aTransformedList: List[Int] = listMonads.flatMap(aList)(x => List(x + 1))
+  val aTransformedList: List[Int] = listMonads.flatMap(aList)(x => List(x + 1)) //List(3, 4)
+
+  //TODO 2: Use a monad of a Future
+  import cats.instances.future._
+  val futureMonad: Monad[Future] = Monad[Future]
+  val aFuture: Future[Int] = futureMonad.pure(42)
+  val aTransformedFuture: Future[Int] = futureMonad.flatMap(aFuture)(x => Future(x + 50))
+
+  //specialized API
+  def getPairsList(number: List[Int], chars: List[Char]): List[(Int, Char)] =
+    for {
+      n <- number
+      c <- chars
+    } yield (n, c)
+
+  def getPairOption(number: Option[Int], chars: Option[Char]): Option[(Int, Char)] =
+    for {
+      n <- number
+      c <- chars
+    } yield (n, c)
+
+  def getPairFuture(number: Future[Int], chars: Future[Char]): Future[(Int, Char)] =
+    for {
+      n <- number
+      c <- chars
+    } yield (n, c)
+
+  // let generalize the concept
+//   def do10x[F[_]](container: F[Int])(implicit functor: Functor[F]): F[Int] =
+//     functor.map(container)(_ * 10
+  def generalizePairs[M[_], A, B](a: M[A], b: M[B])(implicit monad: Monad[M]): M[(A, B)] =
+    monad.flatMap(a)(a => monad.map(b)(b => (a, b)))
 
   def main(args: Array[String]): Unit = {
     println("-" * 50)
     println("In Monads")
-    println(this.aList)
+    println(generalizePairs(numberList, charList))
+    println(generalizePairs(numberOption, charOption))
+    println(generalizePairs(numberFuture, charFuture).foreach(println))
     println("-" * 50)
   }
 }
