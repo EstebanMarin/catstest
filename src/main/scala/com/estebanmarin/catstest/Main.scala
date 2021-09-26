@@ -1,4 +1,7 @@
 package com.estebanmarin
 package catstest
 
-object CatsIntro {}
+object CatsIntro {
+  def main(args: Array[String]): Unit =
+    Semigroups.Semigroups.run()
+}
