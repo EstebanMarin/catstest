@@ -33,9 +33,12 @@ lazy val commonScalacOptions = Seq(
     (Compile / console / scalacOptions).value,
 )
 
+val catsVersion = "2.3.0"
+
 lazy val dependencies = Seq(
   libraryDependencies ++= Seq(
     // main dependencies
+    "org.typelevel" %% "cats-core" % catsVersion
   ),
   libraryDependencies ++= Seq(
     com.github.alexarchambault.`scalacheck-shapeless_1.15`,
