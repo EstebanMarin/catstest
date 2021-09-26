@@ -32,25 +32,26 @@ object HMMonoids {
   //TODO 3
   // implement your own monoid
   case class ShoppingCart(item: List[String], total: Double)
-  def checkout(shoppingCarts: List[ShoppingCart]): ShoppingCart = ???
+  def checkout(shoppingCarts: List[ShoppingCart]): ShoppingCart = combineFold(shoppingCarts)
 
-  implicit val shopppingCardMonoid = Monoid.instance(
+  implicit val shopppingCardMonoid: Monoid[ShoppingCart] = Monoid.instance(
     ShoppingCart(List(), 0),
     (sh1: ShoppingCart, sh2: ShoppingCart) =>
       ShoppingCart(sh1.item |+| sh2.item, sh1.total |+| sh2.total),
   )
 
-  val shoppingCards = List(
+  val shoppingCards: List[ShoppingCart] = List(
     ShoppingCart(List("Car", "Toy", "Fish"), 95),
     ShoppingCart(List("Dippers", "Bandana"), 75),
     ShoppingCart(List("Guitar"), 65),
   )
 
-  def main(args: Array[String]): Unit = {
+//   def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
     println("-" * 50)
     println("In monooids")
 
-    println(combineFold(shoppingCards))
+    println(checkout(this.shoppingCards))
     println("-" * 50)
   }
 }
