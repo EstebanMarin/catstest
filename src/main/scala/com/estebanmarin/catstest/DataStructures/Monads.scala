@@ -8,19 +8,19 @@ import scala.concurrent.Future
 object MyMonads {
 
   //list
-  val numberList = List(1, 2, 3)
+  val numberList: List[Int] = List(1, 2, 3)
 
-  val charList = List('a', 'b', 'c')
+  val charList: List[Char] = List('a', 'b', 'c')
 
-  val combinations = for {
+  val combinations: List[(Int, Char)] = for {
     n <- numberList
     p <- charList
   } yield (n, p)
 
   // option
 
-  val numberOption = Option(2)
-  val charOption = Option('d')
+  val numberOption: Option[Int] = Option(2)
+  val charOption: Option[Char] = Option('d')
 
   val combinationChar: Option[(Int, Char)] = for {
     n <- numberOption
@@ -31,8 +31,8 @@ object MyMonads {
   implicit val ec: ExecutionContextExecutorService =
     ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(8))
 
-  val numberFuture = Future(42)
-  val charFuture = Future('a')
+  val numberFuture: Future[Int] = Future(42)
+  val charFuture: Future[Char] = Future('a')
 
   val futureCombinator: Future[(Int, Char)] = for {
     n <- numberFuture
@@ -49,6 +49,9 @@ object MyMonads {
   trait MyMonad[M[_]] {
     def pure[A](value: A): M[A]
     def flatMap[A, B](ma: M[A])(f: A => M[B]): M[B]
+    // Notice that as with functor mondas provide .map
+    //Monads extends functors
+    def map[A, B](ma: M[A])(f: A => B): M[B] = flatMap(ma)(a => pure(f(a)))
   }
 
   import cats.Monad
@@ -97,12 +100,43 @@ object MyMonads {
   def generalizePairs[M[_], A, B](a: M[A], b: M[B])(implicit monad: Monad[M]): M[(A, B)] =
     monad.flatMap(a)(a => monad.map(b)(b => (a, b)))
 
+  // extension methods have wierd imports - pure and flatmaps
+  import cats.syntax.applicative._ //pure is here
+  val oneOption: Option[Int] = 1.pure[Option] // implicit Monad[Option] will be some(1)
+  val oneList: List[Int] = 1.pure[List] // implicit Monad[Option] will be List(1)
+
+  import cats.syntax.flatMap._ // flatMap is here
+  val oneOptionTransformed2: Option[Int] = oneOption.flatMap(x => (x + 1).pure[Option])
+
+// TODO 3
+// implement map method in MyMonad, meaning a monads is a functor as well
+  //monads extends Functors
+  val oneOptionMapped: Option[Int] = Monad[Option].map(Option(2))(_ + 1)
+  import cats.syntax.functor._
+  val oneOptionMapped2: Option[Int] = oneOption.map(_ + 1)
+
+  //for comprehensions
+
+  val composedOptionFor: Option[Int] = for {
+    one <- 1.pure[Option]
+    two <- 2.pure[Option]
+  } yield (one + two)
+
+  //implement a shoter version of get pairs
+
+  def generalizePairs2[M[_], A, B](a: M[A], b: M[B])(implicit monad: Monad[M]): M[(A, B)] =
+    for {
+      a <- a
+      b <- b
+    } yield (a, b)
+
   def main(args: Array[String]): Unit = {
     println("-" * 50)
     println("In Monads")
     println(generalizePairs(numberList, charList))
     println(generalizePairs(numberOption, charOption))
     println(generalizePairs(numberFuture, charFuture).foreach(println))
+    println(this.oneOptionMapped)
     println("-" * 50)
   }
 }
