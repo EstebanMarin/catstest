@@ -59,7 +59,7 @@ object MonadTransformers {
   def main(args: Array[String]): Unit = {
     println("-" * 50)
     val resultFuture: Future[Either[String, String]] =
-      generateTrafficSpikeReport("server1.estebanmarin.com", "server1.estebanmarin.com").value
+      generateTrafficSpikeReport("server1.estebanmarin.com", "server5.estebanmarin.com").value
     resultFuture.foreach(println)
     println("-" * 50)
   }
