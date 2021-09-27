@@ -97,7 +97,7 @@ object MyMonads {
   // let generalize the concept
 //   def do10x[F[_]](container: F[Int])(implicit functor: Functor[F]): F[Int] =
 //     functor.map(container)(_ * 10
-  def generalizePairs[M[_], A, B](a: M[A], b: M[B])(implicit monad: Monad[M]): M[(A, B)] =
+  def generalizePairs[M[_]: Monad, A, B](a: M[A], b: M[B])(implicit monad: Monad[M]): M[(A, B)] =
     monad.flatMap(a)(a => monad.map(b)(b => (a, b)))
 
   // extension methods have wierd imports - pure and flatmaps
@@ -124,13 +124,14 @@ object MyMonads {
 
   //implement a shoter version of get pairs
 
-  def generalizePairs2[M[_], A, B](a: M[A], b: M[B])(implicit monad: Monad[M]): M[(A, B)] =
+  def generalizePairs2[M[_]: Monad, A, B](a: M[A], b: M[B]): M[(A, B)] =
     for {
       a <- a
       b <- b
     } yield (a, b)
 
-  def main(args: Array[String]): Unit = {
+  // def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
     println("-" * 50)
     println("In Monads")
     println(generalizePairs(numberList, charList))
