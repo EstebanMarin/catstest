@@ -56,7 +56,8 @@ object MonadTransformers {
       case Right(true) => Right(s"no problemo")
     }
 
-  def main(args: Array[String]): Unit = {
+  // def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
     println("-" * 50)
     val resultFuture: Future[Either[String, String]] =
       generateTrafficSpikeReport("server1.estebanmarin.com", "server5.estebanmarin.com").value

@@ -60,7 +60,7 @@ object CustomMonads {
       Leaf(x)
   }
 
-//   def main(args: Array[String]): Unit = {
+  // def main(args: Array[String]): Unit = {
   def run(args: Array[String]): Unit = {
     val testTree: Tree[Int] =
       Branch(Leaf(10), Leaf(20))
