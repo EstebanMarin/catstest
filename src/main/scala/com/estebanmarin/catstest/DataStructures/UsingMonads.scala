@@ -67,6 +67,16 @@ object UsingMonads {
     def getConnection(cif: Config): M[Connection]
     def issueRequest(connection: Connection, payload: String): M[String]
   }
+
+  def getResponse[M[_]: Monad](
+      clif: Config,
+      service: HttpService[M],
+      payload: String,
+    ): M[String] =
+    for {
+      conn <- service.getConnection(clif)
+      response <- service.issueRequest(conn, payload)
+    } yield response
   /*
   TODO provide a real implementatio of HTTP service using either a TRy Option Future Either
    */
@@ -130,6 +140,10 @@ object UsingMonads {
     println(aggressiveServerResponse)
     println(loadingOrServerResponse)
 
+    val genericRespose = getResponse(conf, LoadingOrServer, "Hello main")
+    println(genericRespose)
+    val genericRespose2 = getResponse(conf, AggressiveHttpSevere, "Hello main aggresive")
+    println(genericRespose2)
     println("-" * 50)
   }
 }
