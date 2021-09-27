@@ -60,7 +60,8 @@ object CustomMonads {
       Leaf(x)
   }
 
-  def main(args: Array[String]): Unit = {
+//   def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
     val testTree: Tree[Int] =
       Branch(Leaf(10), Leaf(20))
     val changedTree = TreeMonad.flatMap(testTree)(v => Branch(Leaf(v + 1), Leaf(v + 2)))
