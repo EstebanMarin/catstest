@@ -81,14 +81,26 @@ object UsingMonads {
   }
 
   // TODO implement another HTTPServive with LoadingOr or ErrorOr
-  object LoadingOrHttpService extends HttpService[LoadingOr] {
+  object AggressiveHttpSevere extends HttpService[ErrorOr] {
+    override def getConnection(cif: Config): ErrorOr[Connection] =
+      if (!cif.contains("host") || !cif.contains("port"))
+        Left(new RuntimeException("Paila"))
+      else
+        Right(Connection(conf("host"), conf("port")))
+    override def issueRequest(connection: Connection, payload: String): ErrorOr[String] =
+      if (payload.length > 50) Left(new RuntimeException("Paila"))
+      else Right(s"Request $payload has been accpeted")
+  }
+
+  object LoadingOrServer extends HttpService[LoadingOr] {
     override def getConnection(cif: Config): LoadingOr[Connection] =
       if (!cif.contains("host") || !cif.contains("port"))
-        Left("Error Connexion")
+        Left("Paila")
       else
         Right(Connection(conf("host"), conf("port")))
     override def issueRequest(connection: Connection, payload: String): LoadingOr[String] =
-      if (payload.length > 50) Left("Paila") else Right(s"Request $payload has been accpeted")
+      if (payload.length > 50) Left("Paila")
+      else Right(s"Request $payload has been accpeted")
   }
 
   def main(args: Array[String]): Unit = {
@@ -102,8 +114,22 @@ object UsingMonads {
       response: String <- OptionHttpService.issueRequest(conn, "Hello Second Time")
     } yield response
 
+    val aggressiveServerResponse: Either[Throwable, String] = for {
+      conn: Connection <- AggressiveHttpSevere.getConnection(conf)
+      response: String <- AggressiveHttpSevere.issueRequest(conn, "Hello Second Time")
+    } yield response
+
+    val loadingOrServerResponse = for {
+      conn: Connection <- LoadingOrServer.getConnection(conf)
+      response: String <- LoadingOrServer.issueRequest(conn, "Hello Second Time")
+    } yield response
+
     println(response)
     println(secondResponse)
+
+    println(aggressiveServerResponse)
+    println(loadingOrServerResponse)
+
     println("-" * 50)
   }
 }
