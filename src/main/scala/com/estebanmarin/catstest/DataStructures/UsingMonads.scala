@@ -113,7 +113,8 @@ object UsingMonads {
       else Right(s"Request $payload has been accpeted")
   }
 
-  def main(args: Array[String]): Unit = {
+  // def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
     println("-" * 50)
     val response: Option[String] = OptionHttpService
       .getConnection(conf)
@@ -142,7 +143,7 @@ object UsingMonads {
 
     val genericRespose = getResponse(conf, LoadingOrServer, "Hello main")
     println(genericRespose)
-    val genericRespose2 = getResponse(conf, AggressiveHttpSevere, "Hello main aggresive")
+    val genericRespose2 = getResponse(conf, AggressiveHttpSevere, "Hello main")
     println(genericRespose2)
     println("-" * 50)
   }
