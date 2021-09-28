@@ -1,5 +1,8 @@
 package com.estebanmarin.catstest.datamanipulation
 
+import cats.data.Kleisli
+import cats.Id
+
 object Readers {
   final case class Configuration(
       dbUsername: String,
@@ -36,6 +39,15 @@ object Readers {
       .flatMap(lastOrderId => dbReader.map(_.getStatus(lastOrderId)))
     userLastOrderIdReader.run(configuration)
   }
-  def main(args: Array[String]): Unit =
+
+  def userOrderFor(username: String): Reader[Configuration, String] = for {
+    lastOrderId <- dbReader.map(_.getLastOrderId(username))
+    status <- dbReader.map(_.getStatus(lastOrderId))
+  } yield status
+
+  def main(args: Array[String]): Unit = {
     println(estebanOrderStatus(configuration))
+    println(getLastOrderStatus("esteban"))
+    println(userOrderFor("esteban").run(configuration))
+  }
 }
