@@ -1,6 +1,10 @@
 package com.estebanmarin.catstest
 package datamanipulation
 
+import scala.concurrent.ExecutionContext
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+
 object Writers {
   import cats.data.Writer
   //1 - define them at the start
@@ -46,9 +50,36 @@ object Writers {
 
   val countAndLog = countAndLogWithWriter(3).run
 
+  def naiveSum(n: Int): Int =
+    if (n <= 0) 0
+    else {
+      println(s"now in $n")
+      val lowerSum = naiveSum(n - 1)
+      println(s"Computed sum (${n - 1}) = $lowerSum")
+      lowerSum + n
+    }
+
+  // Benefit #2: Writers can keep logs separate on multiple threads
+
+  implicit val ec: ExecutionContext =
+    ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(8))
+
+  def sumWithWriter(n: Int): Writer[Vector[String], Int] =
+    if (n <= 0) Writer(Vector(), 0)
+    else
+      for {
+        _ <- Writer(Vector(s"Now at $n"), n)
+        lowerSum <- sumWithWriter(n - 1)
+        _ <- Writer(Vector(s"Computed sum (${n - 1}) = $lowerSum"), n)
+      } yield lowerSum + n
+
   def main(args: Array[String]): Unit = {
     println("-" * 50)
-    println(countAndLog)
+    // we can keep logs from threads separate
+    val sumFuture1 = Future(sumWithWriter(10))
+    val sumFuture2 = Future(sumWithWriter(10))
+    val logs1 = sumFuture1.map(_.written) // logs from thread 1
+    val logs2 = sumFuture2.map(_.written) // logs from thread 2
     println("-" * 50)
   }
 }
