@@ -3,7 +3,7 @@ package datamanipulation
 
 import scala.concurrent.ExecutionContext
 import java.util.concurrent.Executors
-import java.util.concurrent.Future
+import scala.concurrent.Future
 
 object Writers {
   import cats.data.Writer
@@ -73,7 +73,8 @@ object Writers {
         _ <- Writer(Vector(s"Computed sum (${n - 1}) = $lowerSum"), n)
       } yield lowerSum + n
 
-  def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
+    // def main(args: Array[String]): Unit = {
     println("-" * 50)
     // we can keep logs from threads separate
     val sumFuture1 = Future(sumWithWriter(10))
