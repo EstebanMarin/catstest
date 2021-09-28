@@ -46,6 +46,7 @@ object States {
 
   //Methods available already
   import cats.data.State._
+  //were a reducing imperative computations to declarative computatins with forComprehension
   val program: State[Int, (Int, Int, Int)] = for {
     // don't modify the the state
     a <- get[Int]
