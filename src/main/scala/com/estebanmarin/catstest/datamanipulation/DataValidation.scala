@@ -109,7 +109,8 @@ object DataValidation {
   val aValidMeaningOfLife: Validated[List[String], Int] = 42.valid[List[String]]
   val anError: Validated[String, Int] = "Something went wrong".invalid[Int]
 
-  def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
+    // def main(args: Array[String]): Unit = {
     val form = Map(
       "Name" -> "",
       "Email" -> "danielrockthejvm.com",
