@@ -62,7 +62,8 @@ object Evaluation {
     if (list.isEmpty) Eval.now(list)
     else Eval.defer(reverseEval(list.tail).map(_ :+ list.head))
 
-  def main(args: Array[String]): Unit = {
+//   def main(args: Array[String]): Unit = {
+  def ruin(args: Array[String]): Unit = {
     println(defer(Eval.now {
       println("Now!")
       42
