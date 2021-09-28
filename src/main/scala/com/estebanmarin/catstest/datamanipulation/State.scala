@@ -60,7 +60,8 @@ object States {
     c <- inspect[Int, Int](_ * 2)
   } yield (a, b, c)
 
-  def main(args: Array[String]): Unit = {
+//   def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
     val initialShoppingCart = ShoppingCart(List(), 0.0)
     println("-" * 50)
     // println(iterativeFor.run(10).value)
